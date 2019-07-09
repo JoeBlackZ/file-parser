@@ -1,0 +1,31 @@
+server:
+  port: 8888
+  servlet:
+    application-display-name: file-parser
+    context-path: /
+    session:
+      timeout: -1
+
+spring:
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      database: file_parser
+      grid-fs-database: file_parser_gridfs
+  servlet:
+    multipart:
+      max-request-size: -1
+      max-file-size: -1
+  application:
+    name: file-parser
+  thymeleaf:
+    cache: false
+
+logging:
+  file: logs/file-parser.log
+  level:
+    com.joe.fileParser.*: info
+  pattern:
+    console: '%d{yyyy/MM/dd-HH:mm:ss} [%thread] %-5level %logger- %msg%n'
+    file: '%d{yyyy/MM/dd-HH:mm} [%thread] %-5level %logger- %msg%n'
