@@ -8,13 +8,39 @@
     <title>File - Parser - Search</title>
 </head>
 <body>
-<div class="layui-container" style="background-color: #eeeeee">
-    <div class="layui-row layui-col-space30">
+<div class="layui-container">
+    <div class="layui-row">
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-xs" lay-event="openUpload">上传文件</button>
+                <button class="layui-btn layui-btn-sm" lay-event="batchDelete">批量删除</button>
+            </div>
+        </script>
         <table id="fileTable" lay-filter="fileTableFilter"></table>
     </div>
 </div>
 
+<script th:src="@{'/plugins/jQuery/jquery-3.4.1.min.js'}"></script>
 <script th:src="@{'/plugins/layui-v2.5.4/layui.js'}"></script>
 <script th:src="@{'/js/index.js'}"></script>
 </body>
+<div id="uploadWindow" class="uploadWindow">
+    <div class="layui-upload">
+        <button type="button" class="layui-btn layui-btn-xs" id="testList">选择多文件</button>
+        <div class="layui-upload-list">
+            <table class="layui-table">
+                <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>大小</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="demoList"></tbody>
+            </table>
+        </div>
+        <button type="button" class="layui-btn layui-btn-xs" id="testListAction">开始上传</button>
+    </div>
+</div>
 </html>
