@@ -41,7 +41,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
           type: 1,
           title: '文件上传',
           skin: 'layui-layer-rim', //加上边框
-          area: ['420px', '240px'], //宽高
+          area: ['600px', '300px'], //宽高
           content: $('#uploadWindow')
         });
     }

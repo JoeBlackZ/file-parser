@@ -13,7 +13,7 @@
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
                 <button class="layui-btn layui-btn-xs" lay-event="openUpload">上传文件</button>
-                <button class="layui-btn layui-btn-sm" lay-event="batchDelete">批量删除</button>
+                <button class="layui-btn layui-btn-xs" lay-event="batchDelete">批量删除</button>
             </div>
         </script>
         <table id="fileTable" lay-filter="fileTableFilter"></table>
@@ -27,6 +27,7 @@
 <div id="uploadWindow" class="uploadWindow">
     <div class="layui-upload">
         <button type="button" class="layui-btn layui-btn-xs" id="testList">选择多文件</button>
+        <button type="button" class="layui-btn layui-btn-xs" id="testListAction">开始上传</button>
         <div class="layui-upload-list">
             <table class="layui-table">
                 <thead>
@@ -40,7 +41,6 @@
                 <tbody id="demoList"></tbody>
             </table>
         </div>
-        <button type="button" class="layui-btn layui-btn-xs" id="testListAction">开始上传</button>
     </div>
 </div>
 </html>
