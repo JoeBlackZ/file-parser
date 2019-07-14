@@ -1,6 +1,5 @@
 package com.joe.fileParser.repository;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.joe.fileParser.model.User;
 import org.bson.types.ObjectId;
@@ -12,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.annotation.Resource;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -29,22 +29,24 @@ public class UserRepositoryTest {
         for (int i = 0; i < 10; i ++) {
             list.add(new User("admin" + i, "管理员" + i, DigestUtil.md5Hex("password"), System.currentTimeMillis()));
         }
-        List<User> result = this.userRepository.insertAll(list);
-        System.err.println(result.size());
+        Collection<User> users = this.userRepository.insertAll(list);
+        System.err.println(users.size());
     }
 
     @Test
-    public void updateById() {
+    public void updateById() throws Exception{
         User user = new User();
         user.setAccount("admin===");
         user.setName("adminUpdate");
-        boolean b = this.userRepository.updateById("5d22ec470deda33948f37953", user);
-        System.err.println(b);
+        user.setId("5d22ec470deda33948f37953");
+        long l = this.userRepository.updateById(user);
+        System.err.println(l);
     }
 
     @Test
     public void deleteByIds() {
-        long l = this.userRepository.deleteByIds(new String[]{"5d22ec470deda33948f37952", "5d22ec470deda33948f37953"});
+        String[] strings = {"5d22ec470deda33948f37952", "5d22ec470deda33948f37953"};
+        long l = this.userRepository.deleteByIds(strings);
         System.err.println(l);
     }
 
@@ -67,7 +69,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void find() {
+    public void find() throws Exception{
         User user = new User();
         user.setAccount("admin");
         List<User> list = this.userRepository.find(user);
@@ -75,16 +77,16 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void findByPage() {
+    public void findByPage() throws Exception{
         User user = new User();
-        user.setPageNum(1);
-        user.setPageSize(10);
+        user.setPage(1);
+        user.setLimit(10);
         List<User> page = this.userRepository.findByPage(user);
         System.err.println(page);
     }
 
     @Test
-    public void findOne() {
+    public void findOne() throws Exception{
         User user = new User();
         user.setAccount("admin");
         User one = this.userRepository.findOne(user);
@@ -104,7 +106,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void count1() {
+    public void count1() throws Exception{
         User user = new User();
         user.setName("管理员");
         long count = this.userRepository.count(user);

@@ -6,20 +6,19 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
 
     table.render({
         elem: '#fileTable',
-        height: 312,
-        url: 'https://www.layui.com/demo/table/user/?page=1&limit=30',
+        height: 'full',
+        url: 'fileInfo/queryList',
         page: true,
         toolbar: '#toolbarDemo',
+        limit: 20,
+        limits: [20, 40, 80],
         cols: [[
             {checkbox: true},
-            {field: 'filename', title: '文件名称', width:100, fixed: 'left', sort: true, align: 'center'},
-            {field: 'sex', title: '性别', width:100, fixed: 'right', align: 'center'},
-            {field: 'city', title: '城市', width:80},
-            {field: 'sign', title: '签名', width: 177},
-            {field: 'experience', title: '积分', width: 80, sort: true},
-            {field: 'score', title: '评分', width: 80, sort: true},
-            {field: 'classify', title: '职业', width: 80},
-            {field: 'wealth', title: '财富', width: 135, sort: true}
+            {field: 'name', title: '文件名称', width:200, sort: true, align: 'center'},
+            {field: 'contentType', title: 'content-type', width:200, align: 'center'},
+            {field: 'extName', title: '文件扩展名', width:200, align: 'center'},
+            {field: 'length', title: '文件大小', width:200, align: 'center'},
+            {field: 'uploadDateTime', title: '上传日期', width:200, align: 'center'}
         ]]
     });
 
@@ -31,7 +30,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
                 openUpload();
                 break;
             case 'batchDelete':
-
+                deleteBatch(checkStatus['data']);
                 break;
         };
     });
@@ -49,7 +48,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
     var demoListView = $('#demoList');
     var uploadListIns = upload.render({
         elem: '#testList',
-        url: '/upload/',
+        url: 'fileInfo/upload/',
         accept: 'file',
         multiple: true,
         auto: false,
@@ -97,5 +96,46 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             tds.eq(2).html('<span style="color: #FF5722;">上传失败</span>');
             tds.eq(3).find('.demo-reload').removeClass('layui-hide'); //显示重传
         }
-      });
+    });
+
+    function deleteBatch(data) {
+        var length = data.length;
+        if (length == 0) return false;
+        var ids = new Array();
+        for(var i = 0; i < length; i ++) {
+            ids.push(data[i]['id']);
+        }
+        $.post({
+            url: 'fileInfo/deleteBatch',
+            dateType: 'json',
+            data: {ids: ids},
+            success: function(data){
+                if (data['code'] === 0) {
+                    layer.msg(data['msg'], {icon: 1});
+                    reloadTableData();
+                } else {
+                    layer.msg(data['msg'], {icon: 2});
+                }
+            }
+        });
+    }
+
+    function reloadTableData(param) {
+        table.reload('fileTable', {
+            where: param,
+//            page: {curr: 1},
+            done: function(res, curr, count){
+                //如果是异步请求数据方式，res即为你接口返回的信息。
+                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                console.log(res);
+                //得到当前页码
+                console.log(curr);
+                //得到数据总量
+                console.log(count);
+                if (res['data'].length == 0 && count != 0) {
+                    table.reload('fileTable', {where: param, page: {curr: curr - 1}});
+                }
+            }
+        });
+    }
 });

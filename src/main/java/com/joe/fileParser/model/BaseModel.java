@@ -11,46 +11,44 @@ public class BaseModel implements Serializable {
 
     @Id
     @Indexed
-    private ObjectId id;
+    private String id;
 
     @Transient
-    private int pageNum;
+    private int page;
 
     @Transient
-    private int pageSize;
+    private int limit;
 
-    @Transient
-    private int pageCount;
-
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getPageNum() {
-        return pageNum;
+    public int getPage() {
+        return page;
     }
 
-    public void setPageNum(int pageNum) {
-        this.pageNum = pageNum;
+    public void setPage(int page) {
+        this.page = page;
     }
 
-    public int getPageSize() {
-        return pageSize;
+    public int getLimit() {
+        return limit;
     }
 
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 
-    public int getPageCount() {
-        return pageCount;
-    }
-
-    public void setPageCount(int pageCount) {
-        this.pageCount = pageCount;
+    @Override
+    public String toString() {
+        return "BaseModel{" +
+                "id=" + id +
+                ", page=" + page +
+                ", limit=" + limit +
+                '}';
     }
 }

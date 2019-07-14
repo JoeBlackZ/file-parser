@@ -1,5 +1,6 @@
 package com.joe.fileParser.repository;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -58,7 +59,7 @@ public class GridFSRepositoryTest {
             System.err.println("getLength:" + next.getLength());
             System.err.println("getUploadDate:" + next.getUploadDate());
             System.err.println("getMetadata:" + next.getMetadata());
-            System.err.println("getMetadata:" + next.getMD5());
+//            System.err.println("getMetadata:" + next.getMD5());
         }
     }
 
@@ -77,12 +78,11 @@ public class GridFSRepositoryTest {
     }
 
     @Test
-    public void downloadByMetadata() throws IOException {
+    public void downloadByMetadata(){
         List<GridFsResource> download = this.gridFSRepository.download(new Document("author", "joeblackz"));
         download.forEach(gridFsResource -> {
             try (InputStream inputStream = gridFsResource.getInputStream()){
-
-
+                FileUtil.writeFromStream(inputStream, "f:\\fileParser\\" + gridFsResource.getFilename());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -90,7 +90,7 @@ public class GridFSRepositoryTest {
     }
 
     @Test
-    public void getFileContentType () throws Exception{
+    public void getFileContentType () {
         File file = new File("F:\\\\test\\\\video_excel_ppt\\\\新建 Microsoft PowerPoint 演示文稿.pptx");
         String contentType = new MimetypesFileTypeMap().getContentType(file);
         System.err.println(contentType);

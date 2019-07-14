@@ -6,9 +6,11 @@ public class ResponseResult implements Serializable {
 
     private int code;
 
-    private String message;
+    private String msg;
 
     private Object data;
+
+    private long count;
 
     private ResponseResult(int code) {
         this.code = code;
@@ -22,12 +24,12 @@ public class ResponseResult implements Serializable {
         this.code = code;
     }
 
-    public String getMessage() {
-        return message;
+    public String getMsg() {
+        return msg;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
     public Object getData() {
@@ -38,12 +40,21 @@ public class ResponseResult implements Serializable {
         this.data = data;
     }
 
+    public long getCount() {
+        return count;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
+    }
+
     @Override
     public String toString() {
         return "ResponseResult{" +
                 "code=" + code +
-                ", message='" + message + '\'' +
+                ", msg='" + msg + '\'' +
                 ", data=" + data +
+                ", count=" + count +
                 '}';
     }
 
@@ -55,13 +66,18 @@ public class ResponseResult implements Serializable {
         return new ResponseResult(1);
     }
 
-    public ResponseResult message(String message) {
-        this.message = message;
+    public ResponseResult msg(Object object) {
+        this.msg = object.toString();
         return this;
     }
 
     public ResponseResult data(Object object) {
         this.data = object;
+        return this;
+    }
+
+    public ResponseResult count(long count) {
+        this.count = count;
         return this;
     }
 }

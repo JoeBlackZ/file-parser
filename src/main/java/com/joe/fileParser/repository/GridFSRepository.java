@@ -34,6 +34,10 @@ public class GridFSRepository {
         return this.gridFsTemplate.store(inputStream, filename, metadata);
     }
 
+    public ObjectId store(InputStream inputStream, String filename) {
+        return this.gridFsTemplate.store(inputStream, filename);
+    }
+
     public void delete(Object object) {
         this.gridFsTemplate.delete(new Query(Criteria.where("_id").is(object)));
     }
@@ -51,7 +55,7 @@ public class GridFSRepository {
         return null;
     }
 
-    public List<GridFsResource> download(Document metadata) throws IOException {
+    public List<GridFsResource> download(Document metadata) {
         if (metadata.isEmpty()) return null;
         Criteria criteria = new Criteria();
         metadata.forEach((s, o) -> criteria.and("metadata.".concat(s)).is(o.toString()));
