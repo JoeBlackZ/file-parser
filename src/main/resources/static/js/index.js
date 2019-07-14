@@ -86,6 +86,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
                 var tds = tr.children();
                 tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
                 tds.eq(3).html(''); //清空操作
+                reloadTableData({}); // 上传完成刷新列表
                 return delete this.files[index]; //删除文件队列已经上传成功的文件
             }
             this.error(index, upload);
@@ -112,7 +113,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             success: function(data){
                 if (data['code'] === 0) {
                     layer.msg(data['msg'], {icon: 1});
-                    reloadTableData();
+                    reloadTableData({});
                 } else {
                     layer.msg(data['msg'], {icon: 2});
                 }

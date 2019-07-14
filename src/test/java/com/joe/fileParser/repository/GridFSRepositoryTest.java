@@ -47,7 +47,7 @@ public class GridFSRepositoryTest {
 
     @Test
     public void delete() {
-        this.gridFSRepository.delete("5d1b22b40deda338b09518c0");
+        this.gridFSRepository.deleteById("5d1b22b40deda338b09518c0");
     }
 
     @Test

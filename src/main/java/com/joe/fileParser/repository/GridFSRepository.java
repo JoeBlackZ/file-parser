@@ -1,15 +1,11 @@
 package com.joe.fileParser.repository;
 
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import com.mongodb.gridfs.GridFS;
-import org.bson.BsonValue;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsCriteria;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Repository;
@@ -18,6 +14,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -38,8 +35,12 @@ public class GridFSRepository {
         return this.gridFsTemplate.store(inputStream, filename);
     }
 
-    public void delete(Object object) {
-        this.gridFsTemplate.delete(new Query(Criteria.where("_id").is(object)));
+    public void deleteById(Object id) {
+        this.gridFsTemplate.delete(new Query(Criteria.where("_id").is(id)));
+    }
+
+    public void deleteByIds(Object[] ids) {
+        this.gridFsTemplate.delete(new Query(Criteria.where("_id").in(ids)));
     }
 
     public GridFSFindIterable findAll() {

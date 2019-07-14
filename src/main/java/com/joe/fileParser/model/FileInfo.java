@@ -1,6 +1,5 @@
 package com.joe.fileParser.model;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -55,7 +54,8 @@ public class FileInfo extends BaseModel{
     public FileInfo() {
     }
 
-    public FileInfo(String name, String extName, Long length, String contentType, String fileId, String uploadDateTime) {
+    public FileInfo(String id, String name, String extName, Long length, String contentType, String fileId, String uploadDateTime) {
+        this.setId(id);
         this.name = name;
         this.extName = extName;
         this.length = length;

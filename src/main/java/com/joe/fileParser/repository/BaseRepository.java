@@ -105,7 +105,7 @@ public abstract class BaseRepository<T, ID extends Serializable> {
     private Criteria getCriteria(BaseModel baseModel) throws Exception{
         Criteria criteria = new Criteria();
         if (baseModel.getId() != null)
-            criteria.and("id").is(baseModel.getId());
+            criteria.and("_id").is(baseModel.getId());
 
         Field[] declaredFields = entityClass.getDeclaredFields();
         for (Field field : declaredFields) {

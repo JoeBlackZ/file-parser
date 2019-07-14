@@ -13,6 +13,9 @@ spring:
       port: 27017
       database: file_parser
       grid-fs-database: file_parser
+    elasticsearch:
+      cluster-name: elasticsearch
+      cluster-nodes: 127.0.0.1:9300
   servlet:
     multipart:
       max-request-size: -1
