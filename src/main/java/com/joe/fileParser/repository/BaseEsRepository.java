@@ -1,15 +1,8 @@
 package com.joe.fileParser.repository;
 
 import com.joe.fileParser.model.BaseModel;
-import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.delete.DeleteRequestBuilder;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.query.DeleteQuery;
-import org.springframework.data.elasticsearch.core.query.IndexQuery;
-import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.*;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
@@ -44,8 +37,8 @@ public abstract class BaseEsRepository<T, ID extends Serializable> {
     }
 
     public void deleteByIds(Object[] ids) {
-        DeleteQuery deleteQuery = new DeleteQuery();
-        this.elasticsearchTemplate.delete(deleteQuery, entityClass);
+        Criteria criteria = new Criteria().and("_id").in(ids);
+        this.elasticsearchTemplate.delete(new CriteriaQuery(criteria), entityClass);
     }
 
 

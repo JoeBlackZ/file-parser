@@ -47,5 +47,11 @@ public class FileInfoEsRepositoryTest {
         System.err.println(s);
     }
 
+    @Test
+    public void deleteByIds() {
+        String[] ids = {"5d2b2f6d4163d82478118fe4", "VFjI72sBA2kq0qnz-mxu", "5d2afa5a4163d82478118fe3"};
+        this.fileInfoEsRepository.deleteByIds(ids);
+    }
+
 
 }

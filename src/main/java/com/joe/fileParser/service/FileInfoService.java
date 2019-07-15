@@ -93,14 +93,14 @@ public class FileInfoService extends BaseService<FileInfo, String> {
      * 1.delete data of mongodb
      * 2.delete fail of GridFS
      * 3.delete data of elastic search
-     * @param id file info id, file GridFS id, file info elastic search id
+     * @param ids file info id, file GridFS id, file info elastic search id
      * @return delete result and msg eg.
      */
-    public ResponseResult deleteFileByIds(String[] id) {
+    public ResponseResult deleteFileByIds(String[] ids) {
         try {
-            this.fileInfoRepository.deleteByIds(id);
-            this.gridFSRepository.deleteByIds(id);
-            this.fileInfoEsRepository.deleteByIds(id);
+            this.fileInfoRepository.deleteByIds(ids);
+            this.gridFSRepository.deleteByIds(ids);
+            this.fileInfoEsRepository.deleteByIds(ids);
             return ResponseResult.success().msg(ResponseMessage.DELETE_SUCCESS);
         }catch (Exception e) {
             e.printStackTrace();

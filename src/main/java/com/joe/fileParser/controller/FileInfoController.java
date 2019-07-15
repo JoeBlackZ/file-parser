@@ -31,6 +31,6 @@ public class FileInfoController {
     @ResponseBody
     @RequestMapping("/deleteBatch")
     public ResponseResult deleteBatch(@RequestParam(value = "ids[]") String[] ids) {
-        return this.fileInfoService.deleteByIds(ids);
+        return this.fileInfoService.deleteFileByIds(ids);
     }
 }

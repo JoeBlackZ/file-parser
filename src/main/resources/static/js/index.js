@@ -32,6 +32,9 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             case 'batchDelete':
                 deleteBatch(checkStatus['data']);
                 break;
+            case 'batchDownload':
+                batchDownload(checkStatus['data']);
+                break;
         };
     });
 
@@ -120,6 +123,28 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             }
         });
     }
+
+    function batchDownload(data) {
+             var length = data.length;
+             if (length == 0) return false;
+             var ids = new Array();
+             for(var i = 0; i < length; i ++) {
+                 ids.push(data[i]['id']);
+             }
+             $.post({
+                 url: 'fileInfo/batchDownload',
+                 dateType: 'json',
+                 data: {ids: ids},
+                 success: function(data){
+                     if (data['code'] === 0) {
+                         layer.msg(data['msg'], {icon: 1});
+                         reloadTableData({});
+                     } else {
+                         layer.msg(data['msg'], {icon: 2});
+                     }
+                 }
+             });
+         }
 
     function reloadTableData(param) {
         table.reload('fileTable', {
