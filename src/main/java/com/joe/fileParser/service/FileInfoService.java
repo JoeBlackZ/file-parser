@@ -3,7 +3,7 @@ package com.joe.fileParser.service;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import com.joe.fileParser.common.ResponseResult;
-import com.joe.fileParser.config.TikaParser;
+import com.joe.fileParser.parser.TikaParser;
 import com.joe.fileParser.enumeration.ResponseMessage;
 import com.joe.fileParser.model.FileInfo;
 import com.joe.fileParser.model.FileInfoEs;
@@ -13,14 +13,12 @@ import com.joe.fileParser.repository.FileInfoEsRepository;
 import com.joe.fileParser.repository.FileInfoRepository;
 import com.joe.fileParser.repository.GridFSRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tika.exception.TikaException;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.xml.sax.SAXException;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -54,7 +52,7 @@ public class FileInfoService extends BaseService<FileInfo, String> {
 
         try (InputStream inputStream = file.getInputStream()) {
             // 解析文件
-            TikaModel tikaModel = this.tikaParser.parse2(inputStream);
+            TikaModel tikaModel = this.tikaParser.parse(inputStream, false);
             // 文件名称
             String originalFilename = file.getOriginalFilename();
             // 保存文件到GridFS
@@ -80,7 +78,7 @@ public class FileInfoService extends BaseService<FileInfo, String> {
                 throw new RuntimeException("file info save elastic search failed !");
 
             return ResponseResult.success().msg(ResponseMessage.UPLOAD_FILE_SUCCESS).data(insert);
-        } catch (IOException | TikaException | RuntimeException | SAXException e) {
+        } catch (IOException | RuntimeException e) {
             e.printStackTrace();
             if (logger.isErrorEnabled())
                 logger.error(e.getMessage());

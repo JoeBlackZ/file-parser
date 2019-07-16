@@ -1,28 +1,23 @@
 package com.joe.fileParser.parser;
 
-import org.apache.tika.Tika;
+import com.joe.fileParser.model.TikaModel;
 import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
-import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Reader;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class FileParserTest {
 
     @Resource
-    private FileParser fileParser;
-
-    private Tika tika = new Tika();
+    private TikaParser tikaParser;
 
     private File xml = new File("F:test\\video_excel_ppt\\activemq.xml");
     private File properties = new File("F:\\test\\video_excel_ppt\\app.properties");
@@ -43,36 +38,13 @@ public class FileParserTest {
     private File rar = new File("F:\\test\\邮件\\新建数据组.rar");
 
     @Test
-    public void parse1() throws IOException, TikaException {
-        String s = tika.parseToString(txt);
-        System.err.println(s);
-    }
-
-    @Test
-    public void parse2() throws IOException {
-        Metadata metadata = new Metadata();
-        Reader reader = tika.parse(txt, metadata);
-        for (String name : metadata.names()) {
-            System.err.println(name + ": " + metadata.get(name));
+    public void parse1() {
+        try (FileInputStream fileInputStream = new FileInputStream(txt)){
+            TikaModel parse = this.tikaParser.parse(fileInputStream);
+            System.err.println(parse);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        BufferedReader bufferedReader = new BufferedReader(reader);
-//        String line;
-//        while ((line = bufferedReader.readLine()) != null) {
-//            System.err.println(line);
-//        }
-        bufferedReader.close();
-
-    }
-
-    @Test
-    public void parse3() {
-        System.err.println(this.fileParser.parse(txt));
-    }
-
-    @Test
-    public void parse4(){
-        String fileContentType = this.fileParser.getFileContentType(docx);
-        System.err.println(fileContentType);
     }
 
 

@@ -50,20 +50,16 @@ public abstract class BaseService<T extends BaseModel, ID extends Serializable> 
 
 
     public ResponseResult deleteByIds(Collection<? extends Serializable> collections) {
-        try {
-            long l = this.getRepository().deleteByIds(collections);
-            if (l > 0)
-                return ResponseResult.success().msg(ResponseMessage.DELETE_SUCCESS).data(l);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ResponseResult.fail().msg(ResponseMessage.DELETE_FAIL);
+        return getResponseResult(this.getRepository().deleteByIds(collections));
     }
 
 
     public ResponseResult deleteByIds(ID[] ids) {
+        return getResponseResult(this.getRepository().deleteByIds(ids));
+    }
+
+    private ResponseResult getResponseResult(long l) {
         try {
-            long l = this.getRepository().deleteByIds(ids);
             if (l > 0)
                 return ResponseResult.success().msg(ResponseMessage.DELETE_SUCCESS).data(l);
         } catch (Exception e) {

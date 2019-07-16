@@ -35,7 +35,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             case 'batchDownload':
                 batchDownload(checkStatus['data']);
                 break;
-        };
+        }
     });
 
     function openUpload() {
@@ -84,7 +84,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             });
         },
         done: function(res, index, upload){
-            if(res.code == 0){ //上传成功
+            if(res.code === 0){ //上传成功
                 var tr = demoListView.find('tr#upload-'+ index);
                 var tds = tr.children();
                 tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
@@ -104,8 +104,8 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
 
     function deleteBatch(data) {
         var length = data.length;
-        if (length == 0) return false;
-        var ids = new Array();
+        if (length === 0) return false;
+        var ids = [];
         for(var i = 0; i < length; i ++) {
             ids.push(data[i]['id']);
         }
@@ -126,8 +126,8 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
 
     function batchDownload(data) {
              var length = data.length;
-             if (length == 0) return false;
-             var ids = new Array();
+             if (length === 0) return false;
+             var ids = [];
              for(var i = 0; i < length; i ++) {
                  ids.push(data[i]['id']);
              }
@@ -158,7 +158,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
                 console.log(curr);
                 //得到数据总量
                 console.log(count);
-                if (res['data'].length == 0 && count != 0) {
+                if (res['data'].length === 0 && count !== 0) {
                     table.reload('fileTable', {where: param, page: {curr: curr - 1}});
                 }
             }
