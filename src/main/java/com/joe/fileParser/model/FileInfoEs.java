@@ -8,7 +8,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 public class FileInfoEs extends BaseModel{
 
     @Field(type = FieldType.Text, analyzer = "ik_max_word")
-    private String fileName;
+    private String name;
 
     @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String content;
@@ -16,18 +16,18 @@ public class FileInfoEs extends BaseModel{
     public FileInfoEs() {
     }
 
-    public FileInfoEs(String id, String fileName, String content) {
+    public FileInfoEs(String id, String name, String content) {
         super.setId(id);
-        this.fileName = fileName;
+        this.name = name;
         this.content = content;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getName() {
+        return name;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getContent() {
@@ -42,7 +42,7 @@ public class FileInfoEs extends BaseModel{
     public String toString() {
         return "EsFIleInfo{" +
                 "id='" + super.getId() + '\'' +
-                ", fileName='" + fileName + '\'' +
+                ", name='" + name + '\'' +
                 ", content='" + content + '\'' +
                 "} " + super.toString();
     }

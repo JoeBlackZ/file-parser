@@ -15,6 +15,7 @@ spring:
       grid-fs-database: file_parser
     elasticsearch:
       cluster-name: elasticsearch
+#      cluster-name: rd-esCluster
       cluster-nodes: 127.0.0.1:9300
   servlet:
     multipart:

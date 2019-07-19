@@ -29,6 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.annotation.Resource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class FileInfoEsRepositoryTest {
     public void insert() {
         FileInfoEs fileInfoEs = new FileInfoEs();
         fileInfoEs.setId("1");
-        fileInfoEs.setFileName("test_file");
+        fileInfoEs.setName("test_file");
         fileInfoEs.setContent("content");
         String insert = this.fileInfoEsRepository.insert(fileInfoEs);
         System.err.println(insert);
@@ -87,17 +88,16 @@ public class FileInfoEsRepositoryTest {
 
     @Test
     public void highlight() {
-        String word = "西北";
-        HighlightBuilder highlightBuilder = new HighlightBuilder()
-                .preTags("<tag>")
-                .postTags("</tag>")
-                .field("name")
-                .field("content");
+        String word = "admin";
         PageRequest pageRequest = PageRequest.of(0, 10);
+//        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("name", word);
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(queryStringQuery(word))
-                .withHighlightBuilder(highlightBuilder)
-                .withHighlightFields(new HighlightBuilder.Field("name"), new HighlightBuilder.Field("content"))
+//                .withQuery(termQueryBuilder)
+                .withQuery(QueryBuilders.queryStringQuery(word).analyzer("standard"))
+                .withHighlightFields(
+                        new HighlightBuilder.Field("name").fragmentOffset(20).preTags("<tag>").postTags("</tag>"),
+                        new HighlightBuilder.Field("content").fragmentOffset(20).preTags("<tag>").postTags("</tag>")
+                )
                 .withPageable(pageRequest)
                 .build();
         this.elasticsearchTemplate.queryForPage(searchQuery, FileInfoEs.class, new SearchResultMapper(){
@@ -105,11 +105,17 @@ public class FileInfoEsRepositoryTest {
             public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
                 SearchHits hits = response.getHits();
                 hits.forEach(hit -> {
-                    String id = hit.getId();
-                    Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-                    sourceAsMap.forEach((key, value) -> {
-                        System.err.println(key + ": " + value);
+                    Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                    highlightFields.forEach((fieldName, highlith) -> {
+                        System.err.println("fieldName: " + fieldName);
+                        System.err.println("highlith name: " + highlith.getName());
+                        System.err.println("fragments: " + Arrays.toString(highlith.getFragments()));
                     });
+//                    String id = hit.getId();
+//                    Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+//                    sourceAsMap.forEach((key, value) -> {
+//                        System.err.println(key + ": " + value);
+//                    });
                 });
                 return null;
             }
