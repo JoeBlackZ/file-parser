@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{'/plugins/layui-v2.5.4/css/layui.css'}">
+    <link rel="stylesheet" th:href="@{'/css/search.css'}">
+    <title>File - Parser - Search</title>
+</head>
+<body>
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="search-panel">
+            <div class="layui-input-inline">
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="Enter the keyword here..." autocomplete="off" class="layui-input" style="width: 400px;">
+            </div>
+            <div class="layui-input-inline">
+                <button class="layui-btn layui-btn-normal" id="search">搜索</button>
+            </div>
+        </div>
+        <div class="content-panel">
+
+        </div>
+    </div>
+</div>
+
+<script th:src="@{'/plugins/jQuery/jquery-3.4.1.min.js'}"></script>
+<script th:src="@{'/plugins/layui-v2.5.4/layui.js'}"></script>
+<script th:src="@{'/js/search.js'}"></script>
+</body>
+</html>

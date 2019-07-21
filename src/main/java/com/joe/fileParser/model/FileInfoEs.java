@@ -1,5 +1,6 @@
 package com.joe.fileParser.model;
 
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -7,10 +8,13 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Document(indexName = "file_info")
 public class FileInfoEs extends BaseModel{
 
-    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    @Transient
+    private String keyword;
+
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word", store = true)
     private String name;
 
-    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word", store = true)
     private String content;
 
     public FileInfoEs() {
@@ -38,10 +42,18 @@ public class FileInfoEs extends BaseModel{
         this.content = content;
     }
 
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
     @Override
     public String toString() {
-        return "EsFIleInfo{" +
-                "id='" + super.getId() + '\'' +
+        return "FileInfoEs{" +
+                "keyword='" + keyword + '\'' +
                 ", name='" + name + '\'' +
                 ", content='" + content + '\'' +
                 "} " + super.toString();

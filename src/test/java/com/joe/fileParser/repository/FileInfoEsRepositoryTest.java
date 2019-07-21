@@ -1,5 +1,6 @@
 package com.joe.fileParser.repository;
 
+import cn.hutool.core.io.FileUtil;
 import com.joe.fileParser.model.FileInfoEs;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -28,6 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -87,6 +89,13 @@ public class FileInfoEsRepositoryTest {
     }
 
     @Test
+    public void findById() {
+        String id = "5d3336037991e831287b9239";
+        FileInfoEs byId = this.fileInfoEsRepository.findByDocumentId(id);
+        FileUtil.writeString(byId.getContent(), "C:\\Users\\JoezBlackZ\\Desktop\\index2.html", Charset.defaultCharset());
+    }
+
+    @Test
     public void highlight() {
         String word = "admin";
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -106,10 +115,10 @@ public class FileInfoEsRepositoryTest {
                 SearchHits hits = response.getHits();
                 hits.forEach(hit -> {
                     Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-                    highlightFields.forEach((fieldName, highlith) -> {
+                    highlightFields.forEach((fieldName, highlight) -> {
                         System.err.println("fieldName: " + fieldName);
-                        System.err.println("highlith name: " + highlith.getName());
-                        System.err.println("fragments: " + Arrays.toString(highlith.getFragments()));
+                        System.err.println("highlight name: " + highlight.getName());
+                        System.err.println("fragments: " + Arrays.toString(highlight.getFragments()));
                     });
 //                    String id = hit.getId();
 //                    Map<String, Object> sourceAsMap = hit.getSourceAsMap();
@@ -121,6 +130,12 @@ public class FileInfoEsRepositoryTest {
             }
         });
 
+    }
+
+    @Test
+    public void testHigh() {
+        final List<FileInfoEs> sql = this.fileInfoEsRepository.search("sql", 0, 10);
+        System.err.println(sql);
     }
 
 }

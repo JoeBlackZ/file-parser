@@ -1,0 +1,44 @@
+.search-panel {
+    background-color: rgb(242, 242, 242);
+    height: 38px;
+    width: 98%;
+    margin-top: 20px;
+    padding: 6px 1%;
+}
+
+tag{
+    color: red;
+    font-style: italic;
+}
+
+.content-panel {
+    background-color: #f9f9f9
+}
+
+.result-item {
+    margin: 5px 5px;
+    padding: 5px 5px;
+}
+
+.name {
+    padding: 5px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.content {
+    padding: 5px;
+}
+
+hr {
+    margin: 0 0;
+}
+
+.search-empty{
+    height: 50px;
+    width: 100%;
+    text-align: center;
+    padding-top: 20px;
+    font-style: italic;
+    color: teal;
+}

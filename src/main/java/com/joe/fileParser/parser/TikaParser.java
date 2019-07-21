@@ -7,6 +7,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
+import org.apache.tika.sax.WriteOutContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -49,8 +50,10 @@ public class TikaParser {
                 content = this.tika.parseToString(inputStream, metadata);
             } else {
                 // use autoDetectParser will not close
-                BodyContentHandler handler = new BodyContentHandler();
+//                BodyContentHandler handler = new BodyContentHandler();
                 ParseContext context = new ParseContext();
+                // set MaxStringLength , the default length is 100 * 1000
+                WriteOutContentHandler handler = new WriteOutContentHandler(tika.getMaxStringLength());
                 this.autoDetectParser.parse(inputStream, handler, metadata, context);
                 content = handler.toString();
             }

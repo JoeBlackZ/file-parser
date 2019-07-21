@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/fileInfo")
@@ -26,6 +27,11 @@ public class FileInfoController {
     @PostMapping("/upload")
     public ResponseResult upload(MultipartFile file) {
         return this.fileInfoService.uploadFile(file);
+    }
+
+    @GetMapping("/preview")
+    public void preview(String fileInfoId, HttpServletResponse response) {
+        this.fileInfoService.previewFileContent(fileInfoId, response);
     }
 
     @ResponseBody

@@ -7,14 +7,19 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
     table.render({
         elem: '#fileTable',
         height: 'full',
-        url: 'fileInfo/queryList',
+        url: '/fileInfo/queryList',
         page: true,
         toolbar: '#toolbarDemo',
         limit: 20,
         limits: [20, 40, 80],
         cols: [[
             {checkbox: true},
-            {field: 'name', title: '文件名称', width:200, sort: true, align: 'center'},
+            {field: 'name', title: '文件名称', width:200, sort: true, align: 'center',
+                templet: function(d){
+                    return '<a style="color: #c00; cursor:pointer;">'+ d.name +'</a>'
+                },
+                event: 'openDetail'
+            },
             {field: 'contentType', title: 'content-type', width:200, align: 'center'},
             {field: 'extName', title: '文件扩展名', width:200, align: 'center'},
             {field: 'length', title: '文件大小', width:200, align: 'center'},
@@ -35,23 +40,37 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             case 'batchDownload':
                 batchDownload(checkStatus['data']);
                 break;
+            case 'openDetail':
+                openDetail();
+                break;
+        }
+    });
+
+    // 监听工具条
+    table.on('tool(fileTableFilter)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+        var data = obj.data; //获得当前行数据
+        var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+        switch(layEvent){
+            case 'openDetail':
+            openDetail(data);
+            break;
         }
     });
 
     function openUpload() {
         layer.open({
-          type: 1,
-          title: '文件上传',
-          skin: 'layui-layer-rim', //加上边框
-          area: ['600px', '300px'], //宽高
-          content: $('#uploadWindow')
+            type: 1,
+            title: '文件上传',
+            skin: 'layui-layer-rim', //加上边框
+            area: ['600px', '300px'], //宽高
+            content: $('#uploadWindow')
         });
     }
 
     var demoListView = $('#demoList');
     var uploadListIns = upload.render({
         elem: '#testList',
-        url: 'fileInfo/upload/',
+        url: '/fileInfo/upload/',
         accept: 'file',
         multiple: true,
         auto: false,
@@ -110,7 +129,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             ids.push(data[i]['id']);
         }
         $.post({
-            url: 'fileInfo/deleteBatch',
+            url: '/fileInfo/deleteBatch',
             dateType: 'json',
             data: {ids: ids},
             success: function(data){
@@ -125,26 +144,26 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
     }
 
     function batchDownload(data) {
-             var length = data.length;
-             if (length === 0) return false;
-             var ids = [];
-             for(var i = 0; i < length; i ++) {
-                 ids.push(data[i]['id']);
-             }
-             $.post({
-                 url: 'fileInfo/batchDownload',
-                 dateType: 'json',
-                 data: {ids: ids},
-                 success: function(data){
-                     if (data['code'] === 0) {
-                         layer.msg(data['msg'], {icon: 1});
-                         reloadTableData({});
-                     } else {
-                         layer.msg(data['msg'], {icon: 2});
-                     }
-                 }
-             });
-         }
+        var length = data.length;
+        if (length === 0) return false;
+        var ids = [];
+        for(var i = 0; i < length; i ++) {
+            ids.push(data[i]['id']);
+        }
+        $.post({
+            url: '/fileInfo/batchDownload',
+            dateType: 'json',
+            data: {ids: ids},
+            success: function(data){
+                if (data['code'] === 0) {
+                     layer.msg(data['msg'], {icon: 1});
+                     reloadTableData({});
+                } else {
+                     layer.msg(data['msg'], {icon: 2});
+                }
+            }
+        });
+    }
 
     function reloadTableData(param) {
         table.reload('fileTable', {
@@ -164,4 +183,24 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             }
         });
     }
+
+    // 文件预览
+    function openDetail(fileInfo) {
+        layer.open({
+            type: 2,
+             title: fileInfo['name'],
+             shadeClose: true,
+             shade: false,
+             maxmin: true, //开启最大化最小化按钮
+             area: ['893px', '600px'],
+             content: '/fileInfo/preview?fileInfoId=' + fileInfo['id']
+        });
+    }
+
+    // 搜索事件
+    $('#search').click(function() {
+        var keyword = $.trim($('[name="keyword"]').val());
+        if(keyword == '') return;
+        window.open('/search/search/' + keyword);
+    });
 });

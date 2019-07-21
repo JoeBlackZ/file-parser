@@ -2,6 +2,7 @@ package com.joe.fileParser.service;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.http.HttpUtil;
 import com.joe.fileParser.common.ResponseResult;
 import com.joe.fileParser.parser.TikaParser;
 import com.joe.fileParser.enumeration.ResponseMessage;
@@ -21,8 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.List;
 
 @Service
 public class FileInfoService extends BaseService<FileInfo, String> {
@@ -50,13 +54,14 @@ public class FileInfoService extends BaseService<FileInfo, String> {
         if (file == null || file.getSize() == 0)
             return ResponseResult.fail().msg(ResponseMessage.UPLOAD_FILE_EMPTY);
 
-        try (InputStream inputStream = file.getInputStream()) {
+        try (InputStream inputStream_parse = file.getInputStream();
+                InputStream inputStream_gridfs = file.getInputStream()) {
             // 解析文件
-            TikaModel tikaModel = this.tikaParser.parse(inputStream, false);
+            TikaModel tikaModel = this.tikaParser.parse(inputStream_parse, true);
             // 文件名称
             String originalFilename = file.getOriginalFilename();
             // 保存文件到GridFS
-            ObjectId objectId = this.gridFSRepository.store(inputStream, originalFilename, new Document(tikaModel.getMetaData()));
+            ObjectId objectId = this.gridFSRepository.store(inputStream_gridfs, originalFilename, new Document(tikaModel.getMetaData()));
             if (objectId == null)
                 return ResponseResult.fail().msg(ResponseMessage.UPLOAD_FILE_FAIL);
             // 文件扩展名 统一采用小写
@@ -106,6 +111,38 @@ public class FileInfoService extends BaseService<FileInfo, String> {
                 logger.error(e.getMessage());
         }
         return ResponseResult.fail().msg(ResponseMessage.DELETE_FAIL);
+    }
+
+    /**
+     * get file content from elastic search to preview
+     * @param fileInfoId 文件id（fileInfo,gridFs,elastic search ）
+     * @param response httpServerResponse
+     */
+    public void previewFileContent(String fileInfoId, HttpServletResponse response) {
+//        response.setHeader("Content-type", "text/html;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        try (PrintWriter writer = response.getWriter()){
+            if (StringUtils.isBlank(fileInfoId)) {
+                writer.write("Invalid parameter. ");
+            } else {
+                final FileInfoEs byDocumentId = this.fileInfoEsRepository.findByDocumentId(fileInfoId);
+                writer.write(byDocumentId.getContent());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ResponseResult searchFile(FileInfoEs fileInfoEs) {
+        try {
+            final List<FileInfoEs> search = this.fileInfoEsRepository.search(fileInfoEs.getKeyword(), fileInfoEs.getPage(), fileInfoEs.getLimit());
+            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(search);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (logger.isErrorEnabled())
+                logger.error(e.getMessage());
+        }
+        return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
     }
 
 }
