@@ -23,14 +23,14 @@ public class FileInfoEsRepository extends BaseEsRepository<FileInfoEs, String> {
         List<FileInfoEs> list = new ArrayList<>();
         PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(QueryBuilders.queryStringQuery(keyword))
+                .withQuery(QueryBuilders.queryStringQuery(keyword).analyzer("ik_smart"))
                 .withHighlightFields(
-                        new HighlightBuilder.Field("name").fragmentOffset(50).preTags("<tag>").postTags("</tag>"),
-                        new HighlightBuilder.Field("content").fragmentOffset(50).preTags("<tag>").postTags("</tag>")
+                        new HighlightBuilder.Field("name").preTags("<tag>").postTags("</tag>"),
+                        new HighlightBuilder.Field("content").preTags("<tag>").postTags("</tag>")
                 )
                 .withPageable(pageRequest)
                 .build();
-        this.elasticsearchTemplate.queryForPage(searchQuery, FileInfoEs.class, new SearchResultMapper() {
+        AggregatedPage<FileInfoEs> fileInfoEs = this.elasticsearchTemplate.queryForPage(searchQuery, FileInfoEs.class, new SearchResultMapper() {
             @Override
             public <E> AggregatedPage<E> mapResults(SearchResponse response, Class<E> clazz, Pageable pageable) {
                 SearchHits hits = response.getHits();
@@ -41,9 +41,6 @@ public class FileInfoEsRepository extends BaseEsRepository<FileInfoEs, String> {
                     fileInfoEs.setName(hit.getSourceAsMap().get("name").toString());
                     fileInfoEs.setContent(hit.getSourceAsMap().get("content").toString());
                     hit.getHighlightFields().forEach((fieldName, highlight) -> {
-//                        System.err.println("fieldName: " + fieldName);
-//                        System.err.println("highlight name: " + highlight.getName());
-//                        System.err.println("fragments: " + Arrays.toString(highlight.getFragments()));
                         switch (fieldName) {
                             case "name":
                                 fileInfoEs.setName(textsToString(highlight.getFragments()));
@@ -64,7 +61,7 @@ public class FileInfoEsRepository extends BaseEsRepository<FileInfoEs, String> {
     private String textsToString(Text[] texts) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Text text : texts) {
-            stringBuilder.append(text);
+            stringBuilder.append(text).append(";");
         }
         return stringBuilder.toString();
     }
