@@ -1,6 +1,7 @@
 package com.joe.fileParser.repository;
 
 import com.joe.fileParser.model.FileInfoEs;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -39,7 +40,7 @@ public class FileInfoEsRepository extends BaseEsRepository<FileInfoEs, String> {
                     FileInfoEs fileInfoEs = new FileInfoEs();
                     fileInfoEs.setId(hit.getId());
                     fileInfoEs.setName(hit.getSourceAsMap().get("name").toString());
-                    fileInfoEs.setContent(hit.getSourceAsMap().get("content").toString());
+                    fileInfoEs.setContent(StringUtils.substring(hit.getSourceAsMap().get("content").toString(), 0, 200));
                     hit.getHighlightFields().forEach((fieldName, highlight) -> {
                         switch (fieldName) {
                             case "name":
