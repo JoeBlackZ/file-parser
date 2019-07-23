@@ -24,7 +24,6 @@ public abstract class BaseEsRepository<T, ID extends Serializable> {
     }
 
     public String insert(BaseModel baseModel) {
-        this.elasticsearchTemplate.createIndex(entityClass);
         IndexQuery indexQuery = new IndexQueryBuilder()
                 .withObject(baseModel)
                 .withId(baseModel.getId())

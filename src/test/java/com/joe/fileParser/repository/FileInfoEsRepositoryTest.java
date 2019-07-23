@@ -3,13 +3,14 @@ package com.joe.fileParser.repository;
 import cn.hutool.core.io.FileUtil;
 import com.joe.fileParser.model.FileInfoEs;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ResultsExtractor;
 import org.springframework.data.elasticsearch.core.SearchResultMapper;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
@@ -94,48 +96,87 @@ public class FileInfoEsRepositoryTest {
         FileInfoEs byId = this.fileInfoEsRepository.findByDocumentId(id);
         FileUtil.writeString(byId.getContent(), "C:\\Users\\JoezBlackZ\\Desktop\\index2.html", Charset.defaultCharset());
     }
+    @Test
+    public void findByFieldId() {
+        String id = "5d3670bda7c4bc3e30fb61da";
+        FileInfoEs byId = this.fileInfoEsRepository.findByDocumentId(id);
+        System.err.println(byId);
+    }
 
     @Test
     public void highlight() {
         String word = "admin";
-        PageRequest pageRequest = PageRequest.of(0, 10);
-//        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("name", word);
-        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-//                .withQuery(termQueryBuilder)
-                .withQuery(QueryBuilders.queryStringQuery(word).analyzer("standard"))
-                .withHighlightFields(
-                        new HighlightBuilder.Field("name").fragmentOffset(20).preTags("<tag>").postTags("</tag>"),
-                        new HighlightBuilder.Field("content").fragmentOffset(20).preTags("<tag>").postTags("</tag>")
-                )
-                .withPageable(pageRequest)
-                .build();
-        this.elasticsearchTemplate.queryForPage(searchQuery, FileInfoEs.class, new SearchResultMapper(){
-            @Override
-            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
-                SearchHits hits = response.getHits();
-                hits.forEach(hit -> {
-                    Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-                    highlightFields.forEach((fieldName, highlight) -> {
-                        System.err.println("fieldName: " + fieldName);
-                        System.err.println("highlight name: " + highlight.getName());
-                        System.err.println("fragments: " + Arrays.toString(highlight.getFragments()));
-                    });
-//                    String id = hit.getId();
-//                    Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-//                    sourceAsMap.forEach((key, value) -> {
-//                        System.err.println(key + ": " + value);
-//                    });
-                });
-                return null;
-            }
-        });
-
-    }
-
-    @Test
-    public void testHigh() {
-        final List<FileInfoEs> sql = this.fileInfoEsRepository.search("sql", 0, 10);
+        final List<FileInfoEs> sql = this.fileInfoEsRepository.search(word, 0, 10);
         System.err.println(sql);
     }
 
+    @Test
+    public void testWildcardQuery() {
+        String keyword = "新建*";
+        WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery("name", keyword);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().query(wildcardQueryBuilder);
+        SearchRequest request = new SearchRequest("file_info").types("fileInfo").source(searchSourceBuilder);
+        SearchResponse searchResponse = this.elasticsearchTemplate.getClient().search(request).actionGet();
+        for (SearchHit hit : searchResponse.getHits().getHits()) {
+            System.err.println(hit.getSourceAsMap().get("name"));
+        }
+    }
+
+    @Test
+    public void testTermQuery() {
+        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder()
+                .withQuery(QueryBuilders.termsQuery("name", "trackerd.log", "app.properties"));
+        List<FileInfoEs> list = this.elasticsearchTemplate.queryForList(nativeSearchQueryBuilder.build(), FileInfoEs.class);
+        list.forEach(fileInfoEs -> System.err.println(fileInfoEs.getName()));
+    }
+
+    @Test
+    public void testMatchAll() {
+        NativeSearchQuery build = new NativeSearchQueryBuilder()
+                .withQuery(
+                        QueryBuilders.matchQuery("name", "新建 Microsoft")
+                        .operator(Operator.OR)
+                )
+                .build();
+        FileInfoEs query = this.elasticsearchTemplate.query(build, response -> {
+            for (SearchHit hit : response.getHits().getHits()) {
+                System.err.println(hit.getSourceAsMap().get("name"));
+            }
+            return null;
+        });
+    }
+
+    @Test
+    public void testMultiMatchQuery() {
+        NativeSearchQuery build = new NativeSearchQueryBuilder()
+                .withQuery(QueryBuilders.multiMatchQuery("新建 Microsoft", "name", "content"))
+                .build();
+        FileInfoEs query = this.elasticsearchTemplate.query(build, response -> {
+            for (SearchHit hit : response.getHits().getHits()) {
+                System.err.println(hit.getSourceAsMap().get("name"));
+            }
+            return null;
+        });
+    }
+
+    @Test
+    public void testBoolQuery() {
+        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("name", "新建");
+        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", "Microsoft").operator(Operator.AND);
+        QueryStringQueryBuilder powerPoint = queryStringQuery("PowerPoint");
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().must(termQueryBuilder).should(matchQueryBuilder).mustNot(powerPoint);
+        NativeSearchQuery build = new NativeSearchQueryBuilder().withQuery(boolQueryBuilder).build();
+        this.elasticsearchTemplate.query(build, response -> {
+            for (SearchHit hit : response.getHits().getHits()) {
+                System.err.println(hit.getSourceAsMap().get("name"));
+            }
+            return null;
+        });
+    }
+
+    @Test
+    public void testSQuery() {
+
+
+    }
 }

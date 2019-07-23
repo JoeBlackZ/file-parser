@@ -21,6 +21,7 @@ import java.util.*;
 public class FileInfoEsRepository extends BaseEsRepository<FileInfoEs, String> {
 
     public List<FileInfoEs> search(String keyword, int pageNum, int pageSize) {
+
         List<FileInfoEs> list = new ArrayList<>();
         PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
@@ -31,11 +32,11 @@ public class FileInfoEsRepository extends BaseEsRepository<FileInfoEs, String> {
                 )
                 .withPageable(pageRequest)
                 .build();
-        AggregatedPage<FileInfoEs> fileInfoEs = this.elasticsearchTemplate.queryForPage(searchQuery, FileInfoEs.class, new SearchResultMapper() {
+
+        this.elasticsearchTemplate.queryForPage(searchQuery, FileInfoEs.class, new SearchResultMapper() {
             @Override
             public <E> AggregatedPage<E> mapResults(SearchResponse response, Class<E> clazz, Pageable pageable) {
                 SearchHits hits = response.getHits();
-                final long totalHits = hits.getTotalHits();
                 hits.forEach(hit -> {
                     FileInfoEs fileInfoEs = new FileInfoEs();
                     fileInfoEs.setId(hit.getId());

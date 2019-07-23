@@ -133,6 +133,12 @@ public class FileInfoService extends BaseService<FileInfo, String> {
         }
     }
 
+    /**
+     * search file content and name by keyword
+     * include page info
+     * @param fileInfoEs search params
+     * @return return search result
+     */
     public ResponseResult searchFile(FileInfoEs fileInfoEs) {
         try {
             final List<FileInfoEs> search = this.fileInfoEsRepository.search(fileInfoEs.getKeyword(), fileInfoEs.getPage(), fileInfoEs.getLimit());
