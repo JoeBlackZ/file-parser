@@ -24,6 +24,8 @@ tag{
     padding: 5px;
     cursor: pointer;
     text-decoration: underline;
+    display: inline-block;
+    margin-right: 10px;
 }
 
 .content {
@@ -41,4 +43,10 @@ hr {
     padding-top: 20px;
     font-style: italic;
     color: teal;
+}
+
+.layui-icon {
+    cursor: pointer;
+    border: 1px solid #62676f;
+    background-color: #90afde;
 }

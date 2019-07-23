@@ -2,6 +2,8 @@ package com.joe.fileParser.service;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.http.HttpUtil;
 import com.joe.fileParser.common.ResponseResult;
 import com.joe.fileParser.parser.TikaParser;
@@ -18,14 +20,15 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -133,6 +136,11 @@ public class FileInfoService extends BaseService<FileInfo, String> {
         }
     }
 
+    /**
+     * search file content and name
+     * @param fileInfoEs search param
+     * @return search result
+     */
     public ResponseResult searchFile(FileInfoEs fileInfoEs) {
         try {
             final List<FileInfoEs> search = this.fileInfoEsRepository.search(fileInfoEs.getKeyword(), fileInfoEs.getPage(), fileInfoEs.getLimit());
@@ -143,6 +151,53 @@ public class FileInfoService extends BaseService<FileInfo, String> {
                 logger.error(e.getMessage());
         }
         return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
+    }
+
+    /**
+     * download file by single id
+     * @param fileInfoId file info id
+     * @param response http servlet response
+     */
+    public void downloadFile(String fileInfoId, HttpServletResponse response) {
+        try (final BufferedInputStream bufferedInputStream = new BufferedInputStream(this.gridFSRepository.download(fileInfoId));
+             final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(response.getOutputStream())
+        ){
+            final FileInfo fileInfo = this.fileInfoRepository.findById(fileInfoId);
+            response.setContentType("application/force-download");// 设置强制下载不打开
+            response.addHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(fileInfo.getName(),"UTF-8"));// 设置文件名
+            byte[] bytes = new byte[253];
+            int length;
+            while ((length = bufferedInputStream.read(bytes)) != -1) {
+                bufferedOutputStream.write(bytes, 0, length);
+            }
+            if (logger.isInfoEnabled())
+                logger.info("download file success");
+        } catch (IOException e) {
+            e.printStackTrace();
+            if (logger.isErrorEnabled())
+                logger.error("download file fail");
+        }
+    }
+
+    public File compressFile(String[] fileInfoIds) {
+        try {
+            if (ArrayUtil.isEmpty(fileInfoIds)) return null;
+            // get system temp dir
+            final String tmpdir = System.getProperty("java.io.tmpdir");
+            StringBuilder stringBuilder = new StringBuilder(tmpdir)
+                    .append(File.separator)
+                    .append(UUID.fastUUID())
+                    .append(File.separator);
+            final List<GridFsResource> download = this.gridFSRepository.download(fileInfoIds);
+            for (GridFsResource gridFsResource : download) {
+                final InputStream inputStream = gridFsResource.getInputStream();
+                final File file = FileUtil.writeFromStream(inputStream, stringBuilder + gridFsResource.getFilename());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

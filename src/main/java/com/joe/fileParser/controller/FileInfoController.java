@@ -39,4 +39,15 @@ public class FileInfoController {
     public ResponseResult deleteBatch(@RequestParam(value = "ids[]") String[] ids) {
         return this.fileInfoService.deleteFileByIds(ids);
     }
+
+    @RequestMapping("/download/{filInfoId}")
+    public void download(@PathVariable String filInfoId, HttpServletResponse response) {
+        this.fileInfoService.downloadFile(filInfoId, response);
+    }
+
+    @ResponseBody
+    @RequestMapping("/downloadBatch")
+    public ResponseResult downloadBatch(@RequestParam(value = "ids[]") String[] ids) {
+        return null;
+    }
 }

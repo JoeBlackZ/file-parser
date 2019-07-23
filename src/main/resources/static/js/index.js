@@ -151,7 +151,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             ids.push(data[i]['id']);
         }
         $.post({
-            url: '/fileInfo/batchDownload',
+            url: '/fileInfo/downloadBatch',
             dateType: 'json',
             data: {ids: ids},
             success: function(data){

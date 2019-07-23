@@ -1,5 +1,6 @@
 package com.joe.fileParser.repository;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.Document;
@@ -60,6 +61,18 @@ public class GridFSRepository {
         if (metadata.isEmpty()) return null;
         Criteria criteria = new Criteria();
         metadata.forEach((s, o) -> criteria.and("metadata.".concat(s)).is(o.toString()));
+        List<GridFsResource> list = new ArrayList<>();
+        GridFSFindIterable gridFSFiles = this.gridFsTemplate.find(new Query(criteria));
+        for (GridFSFile gridFSFile : gridFSFiles) {
+            GridFsResource resource = this.gridFsTemplate.getResource(gridFSFile);
+            list.add(resource);
+        }
+        return list;
+    }
+
+    public List<GridFsResource> download(Object[] ids) {
+        if (ArrayUtil.isEmpty(ids)) return null;
+        Criteria criteria = new Criteria().and("id").in(ids);
         List<GridFsResource> list = new ArrayList<>();
         GridFSFindIterable gridFSFiles = this.gridFsTemplate.find(new Query(criteria));
         for (GridFSFile gridFSFile : gridFSFiles) {
