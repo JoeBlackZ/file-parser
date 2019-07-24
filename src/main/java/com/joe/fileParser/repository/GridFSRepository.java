@@ -72,7 +72,7 @@ public class GridFSRepository {
 
     public List<GridFsResource> download(Object[] ids) {
         if (ArrayUtil.isEmpty(ids)) return null;
-        Criteria criteria = new Criteria().and("id").in(ids);
+        Criteria criteria = new Criteria().and("_id").in(ids);
         List<GridFsResource> list = new ArrayList<>();
         GridFSFindIterable gridFSFiles = this.gridFsTemplate.find(new Query(criteria));
         for (GridFSFile gridFSFile : gridFSFiles) {

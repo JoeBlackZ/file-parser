@@ -68,6 +68,10 @@ $(document).ready(function() {
             window.location.href = '/search/search/' + keyword;
         });
 
+        $('[name="keyword"]').keydown(function(event) {
+            if(event.keyCode ==13) $("#search").trigger("click");
+        });
+
         // 文件预览
         function openDetail(fileId, fileName) {
             layer.open({

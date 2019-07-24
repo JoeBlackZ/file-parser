@@ -35,19 +35,24 @@ public class FileInfoController {
     }
 
     @ResponseBody
-    @RequestMapping("/deleteBatch")
+    @PostMapping("/deleteBatch")
     public ResponseResult deleteBatch(@RequestParam(value = "ids[]") String[] ids) {
         return this.fileInfoService.deleteFileByIds(ids);
     }
 
-    @RequestMapping("/download/{filInfoId}")
+    @GetMapping("/download/{filInfoId}")
     public void download(@PathVariable String filInfoId, HttpServletResponse response) {
         this.fileInfoService.downloadFile(filInfoId, response);
     }
 
     @ResponseBody
-    @RequestMapping("/downloadBatch")
-    public ResponseResult downloadBatch(@RequestParam(value = "ids[]") String[] ids) {
-        return null;
+    @PostMapping("/compressFile")
+    public ResponseResult compressFile(@RequestParam(value = "ids[]") String[] ids, HttpServletResponse response) {
+        return this.fileInfoService.compressFile(ids);
+    }
+
+    @GetMapping("/downloadBatch/{downloadId}")
+    public void downloadBatch(@PathVariable String downloadId, HttpServletResponse response) {
+        this.fileInfoService.downloadCompressFile(downloadId, response);
     }
 }
