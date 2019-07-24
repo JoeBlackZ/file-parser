@@ -16,7 +16,7 @@ public class ConstantConfig {
     /**
      * 压缩文件临时存储路径
      */
-    public static String compressionTempFileLocation;
+    public static final String SYSTEM_TEMP_PATH = System.getProperty("java.io.tmpdir");
 
     /**
      * windows 环境下的WinRAR文件解压命令所在目录
@@ -27,12 +27,7 @@ public class ConstantConfig {
 //    public void setCompressionFileTypes(List<String> compressionFileTypes) {
 //        ConstantConfig.compressionFileTypes = compressionFileTypes;
 //    }
-//
-//    @Value("${constant.compression-temp-file-location}")
-//    public void setCompressionTempFileLocation(String compressionTempFileLocation) {
-//        ConstantConfig.compressionTempFileLocation = compressionTempFileLocation;
-//    }
-//
+
 //    @Value("${constant.win-rar-home}")
 //    public void setWinRarHome(String winRarHome) {
 //        ConstantConfig.winRarHome = winRarHome;

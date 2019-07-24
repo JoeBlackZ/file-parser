@@ -151,13 +151,12 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
             ids.push(data[i]['id']);
         }
         $.post({
-            url: '/fileInfo/batchDownload',
+            url: '/fileInfo/compressFile',
             dateType: 'json',
             data: {ids: ids},
             success: function(data){
                 if (data['code'] === 0) {
-                     layer.msg(data['msg'], {icon: 1});
-                     reloadTableData({});
+                    window.location.href = '/fileInfo/downloadBatch/' + data['data'];
                 } else {
                      layer.msg(data['msg'], {icon: 2});
                 }
@@ -202,5 +201,9 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
         var keyword = $.trim($('[name="keyword"]').val());
         if(keyword == '') return;
         window.open('/search/search/' + keyword);
+    });
+
+    $('[name="keyword"]').keydown(function(event) {
+        if(event.keyCode ==13) $("#search").trigger("click");
     });
 });
