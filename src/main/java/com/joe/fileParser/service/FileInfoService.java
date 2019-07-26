@@ -7,7 +7,6 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ZipUtil;
-import cn.hutool.http.HttpUtil;
 import com.joe.fileParser.common.ResponseResult;
 import com.joe.fileParser.config.ConstantConfig;
 import com.joe.fileParser.parser.TikaParser;
@@ -174,11 +173,7 @@ public class FileInfoService extends BaseService<FileInfo, String> {
             final FileInfo fileInfo = this.fileInfoRepository.findById(fileInfoId);
             response.setContentType("application/force-download");// 设置强制下载不打开
             response.addHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(fileInfo.getName(), "UTF-8"));// 设置文件名
-            byte[] bytes = new byte[253];
-            int length;
-            while ((length = bufferedInputStream.read(bytes)) != -1) {
-                bufferedOutputStream.write(bytes, 0, length);
-            }
+            IoUtil.copy(bufferedInputStream, bufferedOutputStream);
             if (logger.isInfoEnabled())
                 logger.info("download file success");
         } catch (IOException e) {
@@ -200,11 +195,7 @@ public class FileInfoService extends BaseService<FileInfo, String> {
                 throw new RuntimeException("can not find dest file.");
 
             fileInputStream = new FileInputStream(file);
-            byte[] bytes = new byte[253];
-            int length;
-            while ((length = fileInputStream.read(bytes)) != -1) {
-                bufferedOutputStream.write(bytes, 0, length);
-            }
+            IoUtil.copy(fileInputStream, bufferedOutputStream);
             if (logger.isInfoEnabled())
                 logger.info("download file success");
         } catch (IOException e) {

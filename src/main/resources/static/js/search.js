@@ -1,17 +1,15 @@
 $(document).ready(function() {
 
     layui.use(['layer', 'form', 'table', 'upload'], function(){
-        var layer = layui.layer,
-            form = layui.form,
-            upload = layui.upload,
-            table = layui.table;
+        var layer = layui.layer;
 
         // 搜索关键字
-        var keyword = $.trim($('[name="keyword"]').val());
+        var $keyword = $('[name="keyword"]');
+        var keyword = $.trim($keyword.val());
 
         // 页面加载完成后，加载搜索数据
         function requestSearchResult() {
-            if(keyword == '') return;
+            if(keyword === '') return;
             $.post({
                 url: '/search/doSearch',
                 data: {
@@ -64,12 +62,12 @@ $(document).ready(function() {
         // 搜索事件
         $('#search').click(function() {
             var keyword = $.trim($('[name="keyword"]').val());
-            if(keyword == '') return;
+            if(keyword === '') return;
             window.location.href = '/search/search/' + keyword;
         });
 
-        $('[name="keyword"]').keydown(function(event) {
-            if(event.keyCode ==13) $("#search").trigger("click");
+        $keyword.keydown(function(event) {
+            if(event.keyCode === 13) $("#search").trigger("click");
         });
 
         // 文件预览

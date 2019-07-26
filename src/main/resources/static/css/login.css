@@ -1,0 +1,21 @@
+.login-panel {
+    padding: 20px;
+    background-color: #d5d5d3;
+    width: 400px;
+    margin: 30% auto;
+}
+
+.login-title{
+    text-align: center;
+    font-size: large;
+    color: cadetblue;
+}
+
+
+.login-button {
+    width: 100px;
+}
+
+.layui-form-label {
+    color: darkgoldenrod;
+}
