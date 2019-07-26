@@ -23,7 +23,10 @@ public class User extends BaseModel {
 
     public User() {
     }
-
+    public User(String account, String password) {
+        this.account = account;
+        this.password = password;
+    }
     public User(String account, String name, String password, Long createTime) {
         this.account = account;
         this.name = name;
