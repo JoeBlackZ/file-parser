@@ -185,15 +185,7 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
 
     // 文件预览
     function openDetail(fileInfo) {
-        layer.open({
-            type: 2,
-             title: fileInfo['name'],
-             shadeClose: true,
-             shade: false,
-             maxmin: true, //开启最大化最小化按钮
-             area: ['893px', '600px'],
-             content: '/fileInfo/preview?fileInfoId=' + fileInfo['id']
-        });
+       window.open('/fileInfo/preview/' + fileInfo['id']);
     }
 
     // 搜索事件

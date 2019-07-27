@@ -71,16 +71,8 @@ $(document).ready(function() {
         });
 
         // 文件预览
-        function openDetail(fileId, fileName) {
-            layer.open({
-                type: 2,
-                 title: fileName,
-                 shadeClose: true,
-                 shade: false,
-                 maxmin: true, //开启最大化最小化按钮
-                 area: ['893px', '600px'],
-                 content: '/fileInfo/preview?fileInfoId=' + fileId
-            });
+        function openDetail(fileInfoId) {
+            window.open('/fileInfo/preview/' + fileInfoId);
         }
 
     });

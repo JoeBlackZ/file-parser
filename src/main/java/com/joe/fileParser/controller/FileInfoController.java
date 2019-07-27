@@ -4,6 +4,7 @@ import com.joe.fileParser.common.ResponseResult;
 import com.joe.fileParser.model.FileInfo;
 import com.joe.fileParser.service.FileInfoService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,8 +30,15 @@ public class FileInfoController {
         return this.fileInfoService.uploadFile(file);
     }
 
-    @GetMapping("/preview")
-    public void preview(String fileInfoId, HttpServletResponse response) {
+
+    @GetMapping("/preview/{fileInfoId}")
+    public String preview(@PathVariable String fileInfoId, Model model) {
+        model.addAttribute("fileInfo", this.fileInfoService.findById(fileInfoId).getData());
+        return "preview";
+    }
+
+    @GetMapping("/previewData/{fileInfoId}")
+    public void previewData(@PathVariable String fileInfoId, HttpServletResponse response) {
         this.fileInfoService.previewFileContent(fileInfoId, response);
     }
 
@@ -47,7 +55,7 @@ public class FileInfoController {
 
     @ResponseBody
     @PostMapping("/compressFile")
-    public ResponseResult compressFile(@RequestParam(value = "ids[]") String[] ids, HttpServletResponse response) {
+    public ResponseResult compressFile(@RequestParam(value = "ids[]") String[] ids) {
         return this.fileInfoService.compressFile(ids);
     }
 

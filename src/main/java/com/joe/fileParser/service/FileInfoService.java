@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
@@ -130,12 +131,22 @@ public class FileInfoService extends BaseService<FileInfo, String> {
     public void previewFileContent(String fileInfoId, HttpServletResponse response) {
 //        response.setHeader("Content-type", "text/html;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-        try (PrintWriter writer = response.getWriter()) {
+        try (final ServletOutputStream outputStream = response.getOutputStream()) {
             if (StringUtils.isBlank(fileInfoId)) {
-                writer.write("Invalid parameter. ");
+                IoUtil.writeObjects(outputStream, false, "Invalid parameter. ");
             } else {
-                final FileInfoEs byDocumentId = this.fileInfoEsRepository.findByDocumentId(fileInfoId);
-                writer.write(byDocumentId.getContent());
+                final FileInfo byId = this.fileInfoRepository.findById(fileInfoId);
+                final String contentType = byId.getContentType();
+                if (contentType.contains("image") || contentType.contains("video") || contentType.contains("pdf")) {
+                    final InputStream download = this.gridFSRepository.download(fileInfoId);
+                    IoUtil.copy(download, outputStream);
+                } else {
+                    final FileInfoEs byDocumentId = this.fileInfoEsRepository.findByDocumentId(fileInfoId);
+                    final BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                    bufferedWriter.write(byDocumentId.getContent());
+                    bufferedWriter.flush();
+                    bufferedWriter.close();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
