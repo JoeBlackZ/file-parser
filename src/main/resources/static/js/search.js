@@ -34,7 +34,7 @@ $(document).ready(function() {
                 for(var i = 0; i < list.length; i ++) {
                     var fileInfo = list[i];
                     html += '<div class="result-item">' +
-                    '<div class="name" file-id="' + fileInfo['id'] + '">' +
+                    '<div class="name" file-id="' + fileInfo['id'] + '" content-type="' + fileInfo['contentType'] + '">' +
                     fileInfo['name'] +
                     '</div>' + '<i class="layui-icon layui-icon-download-circle" title="download">download</i>' +
                     '<div class="content">' + fileInfo['content'] + '</div>' +
@@ -46,8 +46,9 @@ $(document).ready(function() {
             contentPanel.html(html);
             $('.name').click(function() {
                 var fileId = $(this).attr('file-id');
+                var contentType = $(this).attr('content-type');
                 var fileName = $(this).text();
-                openDetail(fileId, fileName);
+                openDetail(fileId, fileName, contentType);
             });
 
             $('.layui-icon').click(function() {

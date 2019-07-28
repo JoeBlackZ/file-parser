@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -150,7 +151,20 @@ public class FileInfoService extends BaseService<FileInfo, String> {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try{
+              if (bufferedInputStream != null) bufferedInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private boolean isNeedReadSourceFile(String contentType) {
+        for (String type : Arrays.asList("video", "image", "pdf", "audio")) {
+            if (contentType.contains(type)) return true;
+        }
+        return false;
     }
 
     /**
