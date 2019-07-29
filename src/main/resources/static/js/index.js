@@ -195,6 +195,10 @@ layui.use(['layer', 'form', 'table', 'upload'], function(){
         window.open('/search/search/' + keyword);
     });
 
+    $('#loginOut').click(function() {
+        window.location.href = '/loginOut';
+    });
+
     $('[name="keyword"]').keydown(function(event) {
         if(event.keyCode ==13) $("#search").trigger("click");
     });

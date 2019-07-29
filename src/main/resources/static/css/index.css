@@ -10,3 +10,8 @@
     margin-top: 20px;
     padding: 6px 1%;
 }
+
+#loginOut {
+    position: absolute;
+    right: 20px;
+}

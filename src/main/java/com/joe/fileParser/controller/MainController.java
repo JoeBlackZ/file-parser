@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/")
@@ -38,5 +39,11 @@ public class MainController {
     @GetMapping("/index")
     public String index() {
         return "index";
+    }
+
+    @GetMapping("/loginOut")
+    public String loginOut(HttpSession session) {
+        session.invalidate();
+        return "/";
     }
 }
