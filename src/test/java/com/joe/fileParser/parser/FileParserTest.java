@@ -47,16 +47,6 @@ public class FileParserTest {
     private File rar = new File("F:\\test\\邮件\\新建数据组.rar");
 
     @Test
-    public void parse1() {
-        try (FileInputStream fileInputStream = new FileInputStream(txt)) {
-            TikaModel parse = this.tikaParser.parse(fileInputStream);
-            System.err.println(parse);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void parseToHtml() throws TikaException, SAXException, IOException, TransformerConfigurationException {
         byte[] bytes = FileUtil.readBytes("E:\\dev\\document\\book\\持续集成工具Jenkins.pdf");
         AutoDetectParser tikaParser = new AutoDetectParser();

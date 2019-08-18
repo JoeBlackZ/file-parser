@@ -1,18 +1,6 @@
 DELETE /file_info
 PUT /file_info 
-{
-  "settings": {
-    "number_of_replicas": 5,
-    "number_of_shards": 1,
-    "analysis": {
-      "analyzer": {
-        "default": {
-          "type": "ik_max_word"
-        }
-      }
-    }
-  }
-}
+{}
 POST /file_info/fileInfo/_mapping
 {
   "properties": {

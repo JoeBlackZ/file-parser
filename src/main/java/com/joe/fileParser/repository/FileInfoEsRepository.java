@@ -20,8 +20,14 @@ import java.util.*;
 @Repository
 public class FileInfoEsRepository extends BaseEsRepository<FileInfoEs, String> {
 
+    /**
+     * 根据关键字进行文件高亮的搜索
+     * @param keyword 关键字
+     * @param pageNum 页码
+     * @param pageSize 每页条数
+     * @return 返回文件的搜索结果（高亮结果）
+     */
     public List<FileInfoEs> search(String keyword, int pageNum, int pageSize) {
-
         List<FileInfoEs> list = new ArrayList<>();
         PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
@@ -32,7 +38,6 @@ public class FileInfoEsRepository extends BaseEsRepository<FileInfoEs, String> {
                 )
                 .withPageable(pageRequest)
                 .build();
-
         this.elasticsearchTemplate.queryForPage(searchQuery, FileInfoEs.class, new SearchResultMapper() {
             @Override
             public <E> AggregatedPage<E> mapResults(SearchResponse response, Class<E> clazz, Pageable pageable) {
@@ -60,10 +65,15 @@ public class FileInfoEsRepository extends BaseEsRepository<FileInfoEs, String> {
         return list;
     }
 
+    /**
+     * 将多个高亮结果拼接
+     * @param texts 高亮结果
+     * @return 返回拼接的高亮结果
+     */
     private String textsToString(Text[] texts) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Text text : texts) {
-            stringBuilder.append(text).append(";");
+            stringBuilder.append(text);
         }
         return stringBuilder.toString();
     }

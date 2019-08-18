@@ -15,39 +15,42 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Repository
 public class GridFSRepository {
 
+    /**
+     * spring data mongodb gridFS 模板
+     */
     @Resource
     private GridFsTemplate gridFsTemplate;
 
-    public ObjectId store(InputStream inputStream, String filename, String contentType, Document metadata) {
-        return this.gridFsTemplate.store(inputStream, filename, contentType, metadata);
-    }
-
+    /**
+     * 保存文件到GridFS中
+     * @param inputStream 要保存的文件流
+     * @param filename 文件名称
+     * @param metadata 文件的元数据
+     * @return 返回文件的ObjectId
+     */
     public ObjectId store(InputStream inputStream, String filename, Document metadata) {
         return this.gridFsTemplate.store(inputStream, filename, metadata);
     }
 
-    public ObjectId store(InputStream inputStream, String filename) {
-        return this.gridFsTemplate.store(inputStream, filename);
-    }
-
-    public void deleteById(Object id) {
-        this.gridFsTemplate.delete(new Query(Criteria.where("_id").is(id)));
-    }
-
+    /**
+     * 根据多个删除多个文件
+     * @param ids 多个文件id
+     */
     public void deleteByIds(Object[] ids) {
         this.gridFsTemplate.delete(new Query(Criteria.where("_id").in(ids)));
     }
 
-    public GridFSFindIterable findAll() {
-        return this.gridFsTemplate.find(new Query());
-    }
-
+    /**
+     * 根据文件id下载文件
+     * @param objectId 文件id
+     * @return 返回文件流
+     * @throws IOException 文件读写异常
+     */
     public InputStream download(Object objectId) throws IOException {
         GridFSFile gridFSFile = this.gridFsTemplate.findOne(new Query(Criteria.where("_id").is(objectId)));
         if (gridFSFile != null) {
@@ -57,19 +60,11 @@ public class GridFSRepository {
         return null;
     }
 
-    public List<GridFsResource> download(Document metadata) {
-        if (metadata.isEmpty()) return null;
-        Criteria criteria = new Criteria();
-        metadata.forEach((s, o) -> criteria.and("metadata.".concat(s)).is(o.toString()));
-        List<GridFsResource> list = new ArrayList<>();
-        GridFSFindIterable gridFSFiles = this.gridFsTemplate.find(new Query(criteria));
-        for (GridFSFile gridFSFile : gridFSFiles) {
-            GridFsResource resource = this.gridFsTemplate.getResource(gridFSFile);
-            list.add(resource);
-        }
-        return list;
-    }
-
+    /**
+     * 根据多个文件id下载多个文件
+     * @param ids 文件id
+     * @return 返回多个资源
+     */
     public List<GridFsResource> download(Object[] ids) {
         if (ArrayUtil.isEmpty(ids)) return null;
         Criteria criteria = new Criteria().and("_id").in(ids);

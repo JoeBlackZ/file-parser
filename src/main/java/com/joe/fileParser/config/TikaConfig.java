@@ -5,6 +5,9 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 将解析器交由spring管理
+*/
 @Configuration
 public class TikaConfig {
 

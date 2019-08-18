@@ -40,18 +40,33 @@ import java.util.List;
 @Service
 public class FileInfoService extends BaseService<FileInfo, String> {
 
+    /**
+     * 文件信息
+     */
     @Resource
     private FileInfoRepository fileInfoRepository;
 
+    /**
+     * GridFS
+     */
     @Resource
     private GridFSRepository gridFSRepository;
 
+    /**
+     * 解析器
+     */
     @Resource
     private TikaParser tikaParser;
 
+    /**
+     * elastic search
+     */
     @Resource
     private FileInfoEsRepository fileInfoEsRepository;
 
+    /**
+     * 日志
+     */
     private static final Logger logger = LoggerFactory.getLogger(FileInfoService.class);
 
     @Override
@@ -59,6 +74,11 @@ public class FileInfoService extends BaseService<FileInfo, String> {
         return this.fileInfoRepository;
     }
 
+    /**
+     * 文件上传
+     * @param file 要上传的文件
+     * @return 返回文件上传结果
+     */
     public ResponseResult uploadFile(MultipartFile file) {
         if (file == null || file.getSize() == 0)
             return ResponseResult.fail().msg(ResponseMessage.UPLOAD_FILE_EMPTY);
@@ -66,7 +86,7 @@ public class FileInfoService extends BaseService<FileInfo, String> {
         try (InputStream inputStream_parse = file.getInputStream();
              InputStream inputStream_gridfs = file.getInputStream()) {
             // 解析文件
-            TikaModel tikaModel = this.tikaParser.parse(inputStream_parse, true);
+            TikaModel tikaModel = this.tikaParser.parse(inputStream_parse);
             // 文件名称
             String originalFilename = file.getOriginalFilename();
             // 保存文件到GridFS
@@ -101,13 +121,9 @@ public class FileInfoService extends BaseService<FileInfo, String> {
     }
 
     /**
-     * delete file info
-     * 1.delete data of mongodb
-     * 2.delete fail of GridFS
-     * 3.delete data of elastic search
-     *
-     * @param ids file info id, file GridFS id, file info elastic search id
-     * @return delete result and msg eg.
+     * 批量删除文件 1.文件信息；2.源文件；3.解析的文件内容
+     * @param ids 多个id
+     * @return 返回删除结果
      */
     public ResponseResult deleteFileByIds(String[] ids) {
         try {
@@ -124,10 +140,9 @@ public class FileInfoService extends BaseService<FileInfo, String> {
     }
 
     /**
-     * get file content from elastic search to preview
-     *
+     * 预览解析后的内容，pdf、视频等文件预览源文件
      * @param fileInfoId 文件id（fileInfo,gridFs,elastic search ）
-     * @param response   httpServerResponse
+     * @param response 响应
      */
     public void previewFileContent(String fileInfoId, HttpServletResponse response) {
 //        response.setHeader("Content-type", "text/html;charset=UTF-8");
@@ -160,6 +175,11 @@ public class FileInfoService extends BaseService<FileInfo, String> {
         }
     }
 
+    /**
+     * 需要预览源文件的类型
+     * @param contentType content-type
+     * @return 是否预览源文件
+     */
     private boolean isNeedReadSourceFile(String contentType) {
         for (String type : Arrays.asList("video", "image", "pdf", "audio")) {
             if (contentType.contains(type)) return true;
@@ -168,10 +188,9 @@ public class FileInfoService extends BaseService<FileInfo, String> {
     }
 
     /**
-     * search file content and name
-     *
-     * @param fileInfoEs search param
-     * @return search result
+     * 全文检索
+     * @param fileInfoEs 检索参数
+     * @return 匹配结果
      */
     public ResponseResult searchFile(FileInfoEs fileInfoEs) {
         try {
@@ -186,10 +205,9 @@ public class FileInfoService extends BaseService<FileInfo, String> {
     }
 
     /**
-     * download file by single id
-     *
-     * @param fileInfoId file info id
-     * @param response   http servlet response
+     * 下载单个文件
+     * @param fileInfoId 文件id
+     * @param response 响应
      */
     public void downloadFile(String fileInfoId, HttpServletResponse response) {
         try (final BufferedInputStream bufferedInputStream = new BufferedInputStream(this.gridFSRepository.download(fileInfoId));
@@ -208,6 +226,11 @@ public class FileInfoService extends BaseService<FileInfo, String> {
         }
     }
 
+    /**
+     * 下载被压成压缩包的多个文件
+     * @param downloadId 压缩文件名称
+     * @param response 响应
+     */
     public void downloadCompressFile(String downloadId, HttpServletResponse response) {
         FileInputStream fileInputStream = null;
         File file = null;
@@ -234,6 +257,11 @@ public class FileInfoService extends BaseService<FileInfo, String> {
         }
     }
 
+    /**
+     * 下载多个文件，多个文件被压缩成压缩包
+     * @param ids 多个文件id
+     * @return 返回压缩结果
+     */
     public ResponseResult compressFile(String[] ids) {
         final List<File> files = this.getFiles(ids);
         if (files.isEmpty())
@@ -256,6 +284,11 @@ public class FileInfoService extends BaseService<FileInfo, String> {
         return ResponseResult.fail().msg("compress file fail.");
     }
 
+    /**
+     * 根据多个文件id，从GridFs下载文件
+     * @param fileInfoIds 文件id
+     * @return 返回文件列表
+     */
     private List<File> getFiles(String[] fileInfoIds) {
         try {
             if (ArrayUtil.isEmpty(fileInfoIds)) return Collections.emptyList();

@@ -46,24 +46,6 @@ public class GridFSRepositoryTest {
     }
 
     @Test
-    public void delete() {
-        this.gridFSRepository.deleteById("5d1b22b40deda338b09518c0");
-    }
-
-    @Test
-    public void findAll() {
-        GridFSFindIterable gridFSFiles = this.gridFSRepository.findAll();
-        for (GridFSFile next : gridFSFiles) {
-            System.err.println("id:" + next.getObjectId().toString());
-            System.err.println("getFilename:" + next.getFilename());
-            System.err.println("getLength:" + next.getLength());
-            System.err.println("getUploadDate:" + next.getUploadDate());
-            System.err.println("getMetadata:" + next.getMetadata());
-//            System.err.println("getMetadata:" + next.getMD5());
-        }
-    }
-
-    @Test
     public void downloadFile() {
         try (InputStream inputStream = this.gridFSRepository.download("5d1b39780deda33ab4ad30af");
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))){
@@ -75,18 +57,6 @@ public class GridFSRepositoryTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Test
-    public void downloadByMetadata(){
-        List<GridFsResource> download = this.gridFSRepository.download(new Document("author", "joeblackz"));
-        download.forEach(gridFsResource -> {
-            try (InputStream inputStream = gridFsResource.getInputStream()){
-                FileUtil.writeFromStream(inputStream, "f:\\fileParser\\" + gridFsResource.getFilename());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
     }
 
     @Test

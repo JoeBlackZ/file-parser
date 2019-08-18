@@ -11,8 +11,17 @@ import java.util.List;
 
 public abstract class BaseService<T extends BaseModel, ID extends Serializable> {
 
+    /**
+     * 数据访问层
+     * @return 数据访问层
+     */
     public abstract BaseRepository<T, ID> getRepository();
 
+    /**
+     * 保存
+     * @param t 要保存的数据
+     * @return 返回保存结果
+     */
     public ResponseResult insert(T t) {
         try {
             T insert = this.getRepository().insert(t);
@@ -25,6 +34,11 @@ public abstract class BaseService<T extends BaseModel, ID extends Serializable> 
         return ResponseResult.fail().msg(ResponseMessage.SAVE_FAIL);
     }
 
+    /**
+     * 批量保存
+     * @param collection 要保存的数据
+     * @return 返回保存结果
+     */
     public ResponseResult insertAll(Collection<T> collection) {
         try {
             Collection<T> results = this.getRepository().insertAll(collection);
@@ -80,7 +94,7 @@ public abstract class BaseService<T extends BaseModel, ID extends Serializable> 
     }
 
 
-    public ResponseResult findAll() {
+    private ResponseResult findAll() {
         try {
             List<T> all = this.getRepository().findAll();
             return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(all);
